@@ -12,8 +12,14 @@ return {
       "nvim-lua/plenary.nvim",
     },
     config = function()
+      local pager = "less -R"
+      if vim.fn.executable("delta") == 1 then
+        pager = "delta --dark --paging=never"
+      end
+
       -- Create custom LazyGit configuration
-      local lazygit_config = [[
+      local lazygit_config = string.format([[
+# Managed by Neovim (kdheepak/lazygit.nvim)
 gui:
   theme:
     lightTheme: false
@@ -34,38 +40,38 @@ gui:
       - red
     defaultFgColor:
       - white
-  windowSize: "normal"
+  screenMode: "normal"
   sidePanelWidth: 0.3
 
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: %s
 
 customCommands:
   - key: '<c-p>'
     command: 'git push origin {{.Selected.LocalBranch.Name}}'
-    subprocess: true
     context: 'global'
     description: 'Push to origin'
+    output: terminal
 
   - key: '<c-o>'
     command: 'git pull origin {{.Selected.LocalBranch.Name}}'
-    subprocess: true
     context: 'global'
     description: 'Pull from origin'
+    output: terminal
 
   - key: '<c-b>'
     command: 'gh browse {{.SelectedFile.Name}}'
-    subprocess: true
     context: 'files'
     description: 'Browse file on GitHub'
+    output: terminal
 
   - key: '<c-r>'
     command: 'gh pr create --fill'
-    subprocess: true
     context: 'localBranches'
     description: 'Create PR'
+    output: terminal
 
 keybinding:
   universal:
@@ -86,8 +92,8 @@ keybinding:
 
 os:
   edit: 'nvim {{filename}}'
-  editInTerminal: 'nvim {{filename}}'
-]]
+  editInTerminal: true
+]], pager)
 
       -- Create lazygit config directory if it doesn't exist
       local config_dir = vim.fn.expand("~/.config/lazygit")
@@ -95,11 +101,26 @@ os:
 
       -- Write the config file
       local config_file = config_dir .. "/config.yml"
-      local file = io.open(config_file, "w")
-      if file then
-        file:write(lazygit_config)
-        file:close()
-        print("✅ Custom LazyGit config created at: " .. config_file)
+      local should_write = false
+
+      if not vim.loop.fs_stat(config_file) then
+        should_write = true
+      else
+        -- Only overwrite if the file looks like the old schema we generated before.
+        local content = table.concat(vim.fn.readfile(config_file), "\n")
+        if content:find("windowSize:") then should_write = true end
+        if content:find("\ngit:\n  paging:") then should_write = true end
+        if content:find("\n%s*subprocess:%s*true") then should_write = true end
+        if content:find("editInTerminal:%s*'nvim {{filename}}'") then should_write = true end
+        -- If it's already managed by us and not obviously outdated, leave it alone.
+      end
+
+      if should_write then
+        local file = io.open(config_file, "w")
+        if file then
+          file:write(lazygit_config)
+          file:close()
+        end
       end
     end,
     keys = {
