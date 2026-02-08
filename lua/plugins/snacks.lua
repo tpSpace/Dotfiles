@@ -35,7 +35,7 @@ return {
     { "<leader>bd", function() Snacks.bufdelete.delete() end, desc = "Delete buffer" },
     { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename file" },
     { "<leader>gB", function() Snacks.gitbrowse() end, desc = "Git browse" },
-    { "<leader>gb", function() Snacks.git.blame_line() end, desc = "Git blame line" },
+    { "<leader>gL", function() Snacks.git.blame_line() end, desc = "Git blame line" },
     { "<leader>ss", function() Snacks.scratch() end, desc = "Scratch buffer" },
     { "<leader>pp", function() Snacks.profiler.scratch() end, desc = "Scratch profiler" },
   }
