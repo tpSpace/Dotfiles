@@ -13,6 +13,3 @@ vim.opt.rtp:prepend(lazypath)
 
 require("vim-options")
 require("lazy").setup("plugins")
-require("mason-lspconfig").setup {
-    automatic_enable = false
-}
