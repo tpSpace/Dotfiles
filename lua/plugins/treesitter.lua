@@ -1,12 +1,12 @@
-return { 
-  "nvim-treesitter/nvim-treesitter", build = ":TSUpdate", 
+return {
+  "nvim-treesitter/nvim-treesitter",
+  branch = "master",
+  build = ":TSUpdate",
   config = function()
-    -- treesitter
-    local config = require("nvim-treesitter.configs")
-    config.setup({
-      ensure_installed = {"lua", "javascript", "java", "rust", "c", "typescript", "cpp", "terraform", "yaml", "vim", "vimdoc", "sql", "lua", "go", "json"},
-       hightlight = { enable = true },
+    require("nvim-treesitter.configs").setup({
+      ensure_installed = { "lua", "javascript", "java", "rust", "c", "typescript", "cpp", "terraform", "yaml", "vim", "vimdoc", "sql", "go", "json" },
+      highlight = { enable = true },
       indent = { enable = true },
     })
-  end
+  end,
 }
